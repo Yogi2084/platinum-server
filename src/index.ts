@@ -1,15 +1,24 @@
-import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
+import { serve } from "@hono/node-server";
+import { Hono } from "hono";
+import { authenticationsRoute } from "./routes/authentication";
+import { cors } from "hono/cors";
+import { webClientUrl } from "./utils/environment";
 
-const allRoutes = new Hono()
+const allRoutes = new Hono();
 
-allRoutes.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+allRoutes.use(
+  cors({
+    origin: webClientUrl,
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowHeaders: ["Authorization", "Content-Type"],
+    exposeHeaders: ["Content-Length"],
+    credentials: true,
+    maxAge: 600,
+  }),
+);
 
-serve({
-  fetch:allRoutes.fetch,
-  port: 3000
-}, (info) => {
-  console.log(`Server is running on http://localhost:${info.port}`)
-})
+allRoutes.route("/authentications", authenticationsRoute);
+
+serve(allRoutes, ({ port }) => {
+  console.log(`\tRunning at http://localhost:${port}`);
+});
