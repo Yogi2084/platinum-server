@@ -9,7 +9,10 @@ export const betterAuthClient = betterAuth({
   database: prismaAdapter(prismaClient, {
     provider: "postgresql",
   }),
-  trustedOrigins: [webClientUrl],
+  trustedOrigins: webClientUrl,
+  emailAndPassword: {
+    enabled: true,
+  },
   user: {
     modelName: "User",
   },
